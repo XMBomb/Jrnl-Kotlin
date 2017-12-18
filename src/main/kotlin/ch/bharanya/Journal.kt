@@ -3,21 +3,15 @@ package ch.bharanya
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 
-class Journal {
+class Journal(journalFile: File) {
     val entries: List<JournalEntry>
-
-    constructor(journalFile: File) {
-        this.entries = readAllEntries(journalFile)
-    }
 
     private fun readAllEntries(journalFile: File): List<JournalEntry> {
         val entries = ArrayList<JournalEntry>()
 
         val journalLines = journalFile.readLines()
 
-        val entryText = StringBuilder()
         var currentEntry: JournalEntry? = null
         for (line: String in journalLines) {
             val strippedLine = line.trim()
@@ -29,15 +23,21 @@ class Journal {
                     entries.add(currentEntry)
                 }
                 val restOfLine = strippedLine.substring(patternString.length + 1, strippedLine.length)
-                entryText.appendln(restOfLine)
-                currentEntry = JournalEntry(foundDateTime, entryText.toString())
+                currentEntry = JournalEntry(foundDateTime, restOfLine)
             } catch (e: Exception) {
-                entryText.appendln(strippedLine)
+                currentEntry?.text += strippedLine
             }
+        }
+        if (currentEntry != null){
+            entries.add(currentEntry)
         }
 
 
         return entries
+    }
+
+    init {
+        this.entries = readAllEntries(journalFile)
     }
 
 }
