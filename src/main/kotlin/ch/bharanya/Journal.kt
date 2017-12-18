@@ -14,18 +14,19 @@ class Journal(journalFile: File) {
 
         var currentEntry: JournalEntry? = null
         for (line: String in journalLines) {
-            val strippedLine = line.trim()
+            val trimmedLine = line.trim()
             val patternString = "yyyy-MM-dd HH:mm"
             val pattern = DateTimeFormatter.ofPattern(patternString)
             try {
-                val foundDateTime = LocalDateTime.parse(strippedLine.substring(0, patternString.length), pattern)
+                val foundDateTime = LocalDateTime.parse(trimmedLine.substring(0, patternString.length), pattern)
                 if (currentEntry != null){
                     entries.add(currentEntry)
                 }
-                val restOfLine = strippedLine.substring(patternString.length + 1, strippedLine.length)
+                val restOfLine = trimmedLine.substring(patternString.length + 1, trimmedLine.length)
                 currentEntry = JournalEntry(foundDateTime, restOfLine)
             } catch (e: Exception) {
-                currentEntry?.text += strippedLine
+                if (trimmedLine.isNotBlank())
+                    currentEntry?.text = currentEntry?.text + "\n" + trimmedLine
             }
         }
         if (currentEntry != null){
