@@ -26,7 +26,9 @@ class Journal(journalFile: File) {
                 currentEntry = JournalEntry(foundDateTime, restOfLine)
             } catch (e: Exception) {
                 if (trimmedLine.isNotBlank())
-                    currentEntry?.text = currentEntry?.text + "\n" + trimmedLine
+                    currentEntry?.let {
+                        it.text += "\n$trimmedLine"
+                    }
             }
         }
         if (currentEntry != null){
