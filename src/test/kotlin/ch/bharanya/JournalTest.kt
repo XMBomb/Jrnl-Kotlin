@@ -6,9 +6,11 @@ import java.io.File
 import java.time.LocalDateTime
 
 class JournalTest {
+    private val file = File("res/journal-test.txt")
+
     @Test
     fun testJournalFromFile() {
-        var entries = Journal(File("res/journal-test.txt")).entries
+        var entries = Journal(file).entries
 
         Assert.assertEquals(4, entries.size)
 
@@ -26,10 +28,20 @@ class JournalTest {
     }
 
     @Test
-    fun testWrite(){
-        Journal(File("res/journal-test.txt"))
-                .write(File("res/journal-export-test.txt"))
-        Assert.assertEquals(File("res/journal-test.txt").readText(), File("res/journal-export-test.txt").readText())
+    fun testAdd() {
+        val journal = Journal(file)
+        val testEntry = JournalEntry(LocalDateTime.now(), "testitest")
+        journal.add(testEntry)
+        val lastEntry = journal.entries[journal.entries.size - 1]
+        Assert.assertEquals(testEntry, lastEntry)
     }
+
+    @Test
+    fun testWrite() {
+        val exportFile = File("res/journal-export-test.txt")
+        Journal(file).write(exportFile)
+        Assert.assertEquals(file.readText(), exportFile.readText())
+    }
+
 
 }
