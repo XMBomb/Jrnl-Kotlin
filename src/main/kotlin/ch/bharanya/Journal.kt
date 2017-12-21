@@ -5,9 +5,17 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class Journal(journalFile: File) {
-    val entries: List<JournalEntry>
+    val entries: MutableList<JournalEntry>
+    companion object {
+        const val DATE_FORMAT = "yyyy-MM-dd HH:mm"
+    }
 
-    private fun readAllEntries(journalFile: File): List<JournalEntry> {
+    init {
+        this.entries = readAllEntries(journalFile)
+    }
+
+
+    private fun readAllEntries(journalFile: File): MutableList<JournalEntry> {
         val entries = ArrayList<JournalEntry>()
 
         val journalLines = journalFile.readLines()
@@ -15,11 +23,11 @@ class Journal(journalFile: File) {
         var currentEntry: JournalEntry? = null
         for (line: String in journalLines) {
             val trimmedLine = line.trim()
-            val patternString = "yyyy-MM-dd HH:mm"
+            val patternString = DATE_FORMAT
             val pattern = DateTimeFormatter.ofPattern(patternString)
             try {
                 val foundDateTime = LocalDateTime.parse(trimmedLine.substring(0, patternString.length), pattern)
-                if (currentEntry != null){
+                if (currentEntry != null) {
                     entries.add(currentEntry)
                 }
                 val restOfLine = trimmedLine.substring(patternString.length + 1, trimmedLine.length)
@@ -31,16 +39,19 @@ class Journal(journalFile: File) {
                     }
             }
         }
-        if (currentEntry != null){
+        if (currentEntry != null) {
             entries.add(currentEntry)
         }
-
 
         return entries
     }
 
-    init {
-        this.entries = readAllEntries(journalFile)
+    fun add(entry: JournalEntry){
+        this.entries.add(entry)
+    }
+
+    fun write(journalFile: File){
+        journalFile.writeText(this.entries.map { it.toString() }.joinToString("\n\n"))
     }
 
 }

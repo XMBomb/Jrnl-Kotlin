@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 
 class JournalTest {
     @Test
-    fun testJournalFromText() {
+    fun testJournalFromFile() {
         var entries = Journal(File("res/journal-test.txt")).entries
 
         Assert.assertEquals(4, entries.size)
@@ -23,8 +23,13 @@ class JournalTest {
         )
 
         Assert.assertEquals(expectedEntries, entries)
+    }
 
-
+    @Test
+    fun testWrite(){
+        Journal(File("res/journal-test.txt"))
+                .write(File("res/journal-export-test.txt"))
+        Assert.assertEquals(File("res/journal-test.txt").readText(), File("res/journal-export-test.txt").readText())
     }
 
 }
